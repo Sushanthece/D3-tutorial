@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>D3.js</title>
+
+
+        <link rel="stylesheet" href="reveal.min.css">
+        <link rel="stylesheet" href="animation.css" >
+
+
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1><span style="font-size: 2.25em;">d3.js</span></h1>
+                </section>
+                <section>
+                    <br />
+                    <h1>DATA + DOM</h1>
+                </section>
+                <section>
+                    <br />
+                    <h1>MODULES</h1>
+                </section>
+                <section>
+                    <section>
+                        <h2>Drawing a circle</h2>
+                    </section>
+                    <section>
+<pre>
+// Create a workspace
+
+svg = d3.select('#visualisation')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%');
+</pre>
+                    </section>
+                    <section>
+<pre>
+// Add a circle
+// We are navigating the DOM just like jquery
+
+svg.append('circle')
+    .style('fill', 'white')
+    .attr('r', 40)
+    .attr('cx', 50)
+    .attr('cy', 50)
+    .on('mouseover', function() {
+        d3.select(this).style('fill', 'aliceblue');
+    })
+    .on('mouseout', function() {
+        d3.select(this).style('fill', 'white');
+    });
+</pre>
+                    </section>
+                    <section>
+<pre>
+...
+.on('click', animate);
+
+// d3 gives us helpful stuff, like animations!
+
+function animate() {
+    d3.select(this).transition()
+        .delay(100)
+        .duration(1000)
+        .attr('r', 10)
+        .attr('cx', 30)
+        .style('fill', 'black');
+}
+</pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Drawing data</h2>
+                    </section>
+                    <section>
+<pre>
+// Create a workspace
+
+svg = d3.select('#visualisation')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%');
+</pre>
+                    </section>
+                    <section>
+<pre>
+// Loading data
+d3.csv('data/titanic.csv', function( data ) {
+    // `data` is the data, already parsed
+});
+</pre>
+                    </section>
+                    <section>
+<pre>
+    svg.selectAll( 'circle' )
+        .data( data )
+        .enter().append('circle')
+        .style('fill', 'black')
+        .style('opacity', 0.5)
+        .attr('r', 20)
+        .attr('cx', 50)
+        .attr('cy', '50%');
+    
+    // svg is &lt;svg&gt;
+    // we select all the circles in it
+    // of which there are none,
+    // and assign data to this selection
+    // then we append a circle for each
+    // row of data
+</pre>
+                    </section>
+                    <section>
+<pre>
+var border = 50;
+
+// DOM IS THE DATA
+
+svg.selectAll('circle')
+    .attr('cx', function(d) { return border + d.age*15; })
+    .attr('cy', function(d) { return border + d.pclass*100; })
+    .style('fill', function( d ) { return ( d.survived === '1' ? 'blue' : 'red' ); });
+</pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Making it more<br />GRAPHY</h2>
+                    </section>
+                    <section>
+<pre>
+var xScale = d3.scale.linear()
+    .domain([
+        0,
+        d3.max(
+            data,
+            function( d ) { return parseFloat(d.age, 10); }
+        )
+    ])
+    .range(['5%', '95%']);
+
+var yScale = d3.scale.linear()
+    .domain([
+        1,
+        3
+    ])
+    .range(['25%', '75%']);
+</pre>
+                    </section>
+                    <section>
+<pre>
+    // You might have other circles; I think this is cleaner
+    
+    svg.selectAll('.person')
+        .data( data )
+        .enter().append('circle')
+        .attr('class','person')
+        .style('fill', 'black')
+        .style('opacity', 0.25)
+        .attr('r', 20)
+        .attr('cx', 50)
+        .attr('cy', '50%');
+
+    // DOM IS THE DATA
+    
+    svg.selectAll('.person')
+        .attr('cx', function(d) { return xScale(d.age); })
+        .attr('cy', function(d) { return yScale(d.pclass); })
+        .style('fill', function( d ) { return ( d.survived === '1' ? 'blue' : 'red' ); });
+</pre>
+                    </section>
+                </section>
+                
+            </div>
+        </div>
+
+
+        <script src="head.min.js"></script>
+        <script src="reveal.min.js"></script>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'concave', // default/cube/page/concave/zoom/linear/none
+            });
+
+        </script>
+
+    </body>
+</html>
